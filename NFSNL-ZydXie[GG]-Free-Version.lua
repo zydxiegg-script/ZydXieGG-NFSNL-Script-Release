@@ -5,6 +5,15 @@
 -- Script by: ZydXie
 -- ============================================================
 
+-- WAJIB: Baris pertama harus ini!
+HackingIsTheGame = 1776
+
+-- Lanjutkan kode script kamu di sini
+gg.toast("✅ Script Version 9.3.0 Running!")
+
+-- Contoh fungsi script
+--gg.alert("Welcome to script ZydXie GG!")
+
 if gg.isVisible(true) then gg.setVisible(false) end
 gg.processPause()
 

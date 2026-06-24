@@ -670,7 +670,7 @@ if mat_choice == 1 then
     goto materials_menu
 
 elseif mat_choice == 2 then
-    -- Manual
+    -- Manual (FIXED V3 - pakai refine, tanpa validasi pattern ID)
     ::get_mat_values::
     data = gg.prompt({
         'Current material value',
@@ -700,31 +700,60 @@ elseif mat_choice == 2 then
     end
 
     gg.toast('🔍 Searching for material with value ' .. cur_mat .. '...')
-    gg.clearResults()
-    gg.searchNumber(cur_mat .. ';327681~327699;26;262144;2621443::21', gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1)
-    if gg.isVisible(true) then gg.setVisible(false) end
-    gg.sleep(100)
 
-    mat_count2 = gg.getResultsCount()
-    if mat_count2 == 0 then
+    -- Step 1: Group search dengan pattern lengkap
+    mat_search_count = safeGroupSearch(
+        cur_mat .. ';327681~327699;26;262144;2621443::21',
+        gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1
+    )
+
+    if mat_search_count == 0 then
         gg.alert('❌ Material with value ' .. cur_mat .. ' not found.')
         goto materials_menu
     end
 
-    confirm_mat2 = gg.alert(
-        '✔️️ Material with value ' .. cur_mat .. ' found!\nTotal addresses: ' .. mat_count2 .. '\n\nChange all to ' .. tgt_mat .. '?',
-        '✔️ YES, CHANGE IT!', '❌ CANCEL'
+    -- Step 2: REFINE hanya untuk nilai cur_mat
+    gg.refineNumber(cur_mat, gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1)
+    if gg.isVisible(true) then gg.setVisible(false) end
+    gg.sleep(100)
+
+    mat_refined_count = gg.getResultsCount()
+
+    if mat_refined_count == 0 then
+        gg.alert('❌ After refine, no results with value ' .. cur_mat)
+        goto materials_menu
+    end
+
+    -- Step 3: Konfirmasi
+    confirm_mat_v3 = gg.alert(
+        '✔️️ Material with value ' .. cur_mat .. ' found!\n' ..
+        'After refine: ' .. mat_refined_count .. ' addresses\n\n' ..
+        'Change all to ' .. tgt_mat .. '?',
+        '✔️ YES, CHANGE IT!',
+        '❌ CANCEL'
     )
 
-    if confirm_mat2 == 1 then
-        gg.getResults(1000)
-        gg.editAll(safeToString(tgt_mat), gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1)
-        gg.alert('✔️️ SUCCESS! Material changed: ' .. cur_mat .. ' → ' .. tgt_mat)
+    if confirm_mat_v3 == 1 then
+        -- Step 4: Ambil hasil refine dan edit
+        mat_results_v3 = gg.getResults(mat_refined_count)
+        for i = 1, #mat_results_v3 do
+            if mat_results_v3[i] ~= nil then
+                mat_results_v3[i].value = safeToString(tgt_mat)
+            end
+        end
+        gg.setValues(mat_results_v3)
+
+        gg.alert(
+            '✔️️ SUCCESS!\n\n' ..
+            'Material changed: ' .. cur_mat .. ' → ' .. tgt_mat .. '\n' ..
+            'Address that were modified: ' .. mat_refined_count
+        )
+    else
+        gg.toast('⚠ Canceled')
     end
 
     goto materials_menu
 end
-
 
 -- ============================================================
 -- SECTION 5: VIP POINTS

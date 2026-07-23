@@ -85,7 +85,7 @@ menu = gg.choice({
 }, nil,
 '╔════════ ≪ ° 𝙕𝙮𝙙𝙓𝙞𝙚『𝙂𝙂』° ≫ ════════╗\n\n' ..
 '\t\tGame                  : Need For Speed No Limits\n' ..
-'\t\tVersion               : 9.4.0\n' ..
+'\t\tVersion               : 9.4.1\n' ..
 '\t\tStatus                 : Free Script\n' ..
 '\t\tDate Expired      : 16 August 2026\n' ..
 '\t\tLink Telegram   : t.me/@zydxie\n\n' ..
